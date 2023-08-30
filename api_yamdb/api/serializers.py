@@ -1,6 +1,6 @@
-from rest_framework import serializers
-from titles.models import Categories
 import datetime as dt
+
+from rest_framework import serializers
 
 from titles.models import Categories, Genres, Titles, TitlesGenre
 

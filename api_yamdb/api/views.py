@@ -1,14 +1,14 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, mixins, filters
+from django.shortcuts import get_object_or_404, render
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
 from api.serializers import (
     CategoriesSerializer,
     GenresSerializer,
     TitlesSerializer,
 )
-from rest_framework import status
 from titles.models import Categories, Genres, Titles
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 
 
 class CategoriesViewSet(
