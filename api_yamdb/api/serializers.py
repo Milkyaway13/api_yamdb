@@ -17,25 +17,29 @@ class GenresSerializer(serializers.ModelSerializer):
         model = Genres
 
 
+class CategoryField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        serializer = CategoriesSerializer(value)
+        return serializer.data
+
+
+class GenreField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        serializer = GenresSerializer(value)
+        return serializer.data
+
+
 class TitlesSerializer(serializers.ModelSerializer):
-    genres = GenresSerializer(many=True)
-    category = serializers.SlugRelatedField(
+    genre = GenreField(
+        slug_field='slug', queryset=Genres.objects.all(), many=True
+    )
+    category = CategoryField(
         slug_field='slug', queryset=Categories.objects.all()
     )
 
     class Meta:
         fields = '__all__'
         model = Titles
-
-    def create(self, validated_data):
-        genres = validated_data.pop('genres')
-        title = Titles.objects.create(**validated_data)
-
-        for genre in genres:
-            slug, name = Genres.objects.get(slug=genre['slug'])
-            TitlesGenre.objects.create(title=title, genre=slug)
-
-        return title
 
     def validate_year(self, value):
         year = dt.date.today().year

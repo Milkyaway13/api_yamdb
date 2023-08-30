@@ -8,6 +8,7 @@ from api.serializers import (
 from rest_framework import status
 from titles.models import Categories, Genres, Titles
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 
 class CategoriesViewSet(
@@ -36,13 +37,22 @@ class GenresViewSet(
     search_fields = ['=name']
 
 
-class TitlesViewSet(viewsets.ViewSet):
+class TitlesViewSet(
+    viewsets.ViewSet,
+    viewsets.GenericViewSet,
+):
     queryset = Titles.objects.all()
+    pagination_class = PageNumberPagination
 
-    def get_title(self, queryset, slug):
-        return get_object_or_404(queryset, slug)
+    def get_title(self, queryset, pk):
+        return get_object_or_404(queryset, id=pk)
 
     def list(self, request):
+        page = self.paginate_queryset(self.queryset)
+        if page is not None:
+            serializer = TitlesSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = TitlesSerializer(self.queryset, many=True)
         return Response(serializer.data)
 
@@ -53,19 +63,19 @@ class TitlesViewSet(viewsets.ViewSet):
             return Response(serializer.data)
         return Response(serializer.errors)
 
-    def retrieve(self, request, slug=None):
-        serializer = TitlesSerializer(data=self.get_title(self.queryset, slug))
+    def retrieve(self, request, pk=None):
+        serializer = TitlesSerializer(self.get_title(self.queryset, pk))
         return Response(serializer.data)
 
-    def partial_update(self, request, slug=None):
+    def partial_update(self, request, pk=None):
         serializer = TitlesSerializer(
-            Titles, data=self.get_title(self.queryset, slug), partial=True
+            self.get_title(self.queryset, pk), data=request.data, partial=True
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, slug=None):
-        self.get_title(self.queryset, slug).delete()
+    def destroy(self, request, pk=None):
+        self.get_title(self.queryset, pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
