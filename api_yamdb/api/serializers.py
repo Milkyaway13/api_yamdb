@@ -7,13 +7,19 @@ from titles.models import Categories, Genres, Titles, TitlesGenre
 
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = (
+            'name',
+            'slug',
+        )
         model = Categories
 
 
 class GenresSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = (
+            'name',
+            'slug',
+        )
         model = Genres
 
 
@@ -38,7 +44,14 @@ class TitlesSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'year',
+            'description',
+            'genre',
+            'category',
+        )
         model = Titles
 
     def validate_year(self, value):
