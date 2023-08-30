@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -21,6 +20,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'titles.apps.TitlesConfig',
+    'api.apps.ApiConfig',
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +68,11 @@ DATABASES = {
 }
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
+
 # Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -85,7 +93,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
