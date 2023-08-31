@@ -2,7 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, mixins, filters
 from api.serializers import (
     CategoriesSerializer,
+    CommentsSerializer,
     GenresSerializer,
+    ReviewsSerializer,
     TitlesSerializer,
 )
 from rest_framework import status
@@ -69,3 +71,27 @@ class TitlesViewSet(viewsets.ViewSet):
     def destroy(self, request, slug=None):
         self.get_title(self.queryset, slug).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentsSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        return title.comments.select_related('author')
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
+
+
+class ReviewsViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewsSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        return title.reviews.select_related('author')
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)

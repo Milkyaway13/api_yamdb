@@ -2,7 +2,14 @@ from rest_framework import serializers
 from titles.models import Categories
 import datetime as dt
 
-from titles.models import Categories, Genres, Titles, TitlesGenre
+from titles.models import (
+    Categories,
+    Comments,
+    Genres,
+    Reviews,
+    Titles,
+    TitlesGenre
+)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -44,3 +51,26 @@ class TitlesSerializer(serializers.ModelSerializer):
                 'Год фильма не может быть больше текущего!'
             )
         return value
+
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comments
+        read_only_fields = ['titles', ]
+
+
+class ReviewsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Reviews
+        read_only_fields = ['titles', ]

@@ -41,3 +41,31 @@ class TitlesGenre(models.Model):
 
     def __str__(self):
         return f'{self.genre} {self.title}'
+
+
+class Comments(models.Model):
+    # author = models.ForeignKey(
+    #     User,
+    #     on_delete=models.CASCADE,
+    #     related_name='comments'
+    # )
+    #  Жду модель юзера (она пока на pr)
+    title = models.ForeignKey(
+        Titles, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    created = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
+    
+
+class Reviews(models.Model):
+    # author = models.ForeignKey(
+    #     User,
+    #     on_delete=models.CASCADE,
+    #     related_name='reviews'
+    # )
+    #  Жду модель юзера (она пока на pr)
+    title = models.ForeignKey(
+        Titles, on_delete=models.CASCADE, related_name='reviews')
+    score = models.IntegerField() # Добавлю граничные условия "от и до"
+    created = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
