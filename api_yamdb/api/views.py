@@ -1,7 +1,11 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from api.permissions import (
+    IsAdminUserOrReadOnly,
+    IsAuthorAdminSuperuserOrReadOnlyPermission,
+)
 
 from api.serializers import (
     CategoriesSerializer,
@@ -24,6 +28,7 @@ class CategoriesViewSet(
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=name']
+    permission_classes = IsAdminUserOrReadOnly
 
 
 class GenresViewSet(
@@ -39,6 +44,7 @@ class GenresViewSet(
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=name']
+    permission_classes = IsAdminUserOrReadOnly
 
 
 class TitlesViewSet(
@@ -49,6 +55,7 @@ class TitlesViewSet(
 
     queryset = Titles.objects.all()
     pagination_class = PageNumberPagination
+    permission_classes = IsAuthorAdminSuperuserOrReadOnlyPermission
 
     def get_title(self, queryset, pk):
         return get_object_or_404(queryset, id=pk)
