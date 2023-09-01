@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, status, viewsets
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from api.permissions import (
@@ -47,48 +46,28 @@ class GenresViewSet(
     permission_classes = IsAdminUserOrReadOnly
 
 
-class TitlesViewSet(
-    viewsets.ViewSet,
-    viewsets.GenericViewSet,
-):
+class TitlesViewSet(viewsets.ModelViewSet):
     '''Вьюсет для тайтлов'''
 
     queryset = Titles.objects.all()
-    pagination_class = PageNumberPagination
+    serializer_class = TitlesSerializer
     permission_classes = IsAuthorAdminSuperuserOrReadOnlyPermission
 
     def get_title(self, queryset, pk):
         return get_object_or_404(queryset, id=pk)
 
-    def list(self, request):
-        page = self.paginate_queryset(self.queryset)
-        if page is not None:
-            serializer = TitlesSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+    def update(self, request, *args, **kwargs):
+        return Response(
+            'Метод PUT запрещен!', status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
-        serializer = TitlesSerializer(self.queryset, many=True)
-        return Response(serializer.data)
-
-    def create(self, request):
-        serializer = TitlesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
-
-    def retrieve(self, request, pk=None):
-        serializer = TitlesSerializer(self.get_title(self.queryset, pk))
-        return Response(serializer.data)
-
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, *args, **kwargs):
         serializer = TitlesSerializer(
-            self.get_title(self.queryset, pk), data=request.data, partial=True
+            self.get_title(self.queryset, pk=self.kwargs.get('pk')),
+            data=request.data,
+            partial=True,
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        self.get_title(self.queryset, pk).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
