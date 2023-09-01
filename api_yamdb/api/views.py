@@ -53,9 +53,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitlesSerializer
     permission_classes = IsAuthorAdminSuperuserOrReadOnlyPermission
 
-    def get_title(self, queryset, pk):
-        return get_object_or_404(queryset, id=pk)
-
     def update(self, request, *args, **kwargs):
         return Response(
             'Метод PUT запрещен!', status=status.HTTP_405_METHOD_NOT_ALLOWED
@@ -63,7 +60,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         serializer = TitlesSerializer(
-            self.get_title(self.queryset, pk=self.kwargs.get('pk')),
+            get_object_or_404(self.queryset, id=self.kwargs.get('pk')),
             data=request.data,
             partial=True,
         )
