@@ -17,6 +17,8 @@ class CategoriesViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
 ):
+    '''Вьюсет для категорий'''
+
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     lookup_field = 'slug'
@@ -30,6 +32,8 @@ class GenresViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
 ):
+    '''Вьюсет для жанров'''
+
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     lookup_field = 'slug'
@@ -41,6 +45,8 @@ class TitlesViewSet(
     viewsets.ViewSet,
     viewsets.GenericViewSet,
 ):
+    '''Вьюсет для тайтлов'''
+
     queryset = Titles.objects.all()
     pagination_class = PageNumberPagination
 

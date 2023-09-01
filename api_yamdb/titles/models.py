@@ -2,6 +2,8 @@ from django.db import models
 
 
 class Genres(models.Model):
+    '''Модель жанров'''
+
     name = models.CharField('Имя жанра', max_length=20)
     slug = models.SlugField('Ссылка на жанры', unique=True, max_length=20)
 
@@ -10,6 +12,8 @@ class Genres(models.Model):
 
 
 class Categories(models.Model):
+    '''Модель категорий'''
+
     name = models.CharField('Имя категории', max_length=256)
     slug = models.SlugField('Ссылка на категорию', unique=True, max_length=50)
 
@@ -18,6 +22,8 @@ class Categories(models.Model):
 
 
 class Titles(models.Model):
+    '''Модель тайтлов'''
+
     name = models.CharField('Название произведения', max_length=500)
     year = models.IntegerField('Год выпуска')
     description = models.TextField('Описание', blank=True, null=True)

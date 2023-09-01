@@ -6,6 +6,8 @@ from titles.models import Categories, Genres, Titles, TitlesGenre
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
+    '''Сериализатор для категорий'''
+
     class Meta:
         fields = (
             'name',
@@ -15,6 +17,8 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
 
 class GenresSerializer(serializers.ModelSerializer):
+    '''Сериализатор для жанров'''
+
     class Meta:
         fields = (
             'name',
@@ -24,18 +28,24 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class CategoryField(serializers.SlugRelatedField):
+    '''Кастомное слаг поле категории'''
+
     def to_representation(self, value):
         serializer = CategoriesSerializer(value)
         return serializer.data
 
 
 class GenreField(serializers.SlugRelatedField):
+    '''Кастомное слаг поле жанра'''
+
     def to_representation(self, value):
         serializer = GenresSerializer(value)
         return serializer.data
 
 
 class TitlesSerializer(serializers.ModelSerializer):
+    '''Сериализатор для тайтлов'''
+
     genre = GenreField(
         slug_field='slug', queryset=Genres.objects.all(), many=True
     )
