@@ -2,11 +2,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+
 from api.permissions import (
     IsAdminUserOrReadOnly,
     IsAuthorAdminSuperuserOrReadOnlyPermission,
 )
-
 from api.serializers import (
     CategoriesSerializer,
     GenresSerializer,

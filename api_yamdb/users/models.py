@@ -33,38 +33,32 @@ class User(AbstractUser):
         max_length=254,
         verbose_name='E-mail',
         help_text='Укажите e-mail',
-        unique=True
+        unique=True,
     )
     confirmation_code = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        verbose_name='Проверочный код'
+        max_length=100, blank=True, null=True, verbose_name='Проверочный код'
     )
     first_name = models.CharField(
-        max_length=150,
-        verbose_name='Имя',
-        help_text='Ваше Имя',
-        blank=True
+        max_length=150, verbose_name='Имя', help_text='Ваше Имя', blank=True
     )
     last_name = models.CharField(
         max_length=150,
         verbose_name='Фамилия',
         help_text='Ваша Фамилия',
-        blank=True
+        blank=True,
     )
     bio = models.TextField(
         max_length=1000,
         verbose_name='Биография',
         help_text='Расскажите о себе',
-        blank=True
+        blank=True,
     )
     role = models.CharField(
         max_length=100,
         verbose_name='Роль',
         choices=USER_ROLE,
         default=USER,
-        help_text='Пользователь'
+        help_text='Пользователь',
     )
 
     class Meta:
