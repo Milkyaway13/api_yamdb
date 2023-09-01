@@ -24,7 +24,7 @@ class User(AbstractUser):
     )
 
     username = models.CharField(
-        max_length=50,
+        max_length=150,
         verbose_name='Логин',
         help_text='Укажите логин',
         unique=True,
@@ -36,19 +36,19 @@ class User(AbstractUser):
         unique=True
     )
     confirmation_code = models.CharField(
-        max_length=40,
+        max_length=100,
         blank=True,
         null=True,
         verbose_name='Проверочный код'
     )
     first_name = models.CharField(
-        max_length=50,
+        max_length=150,
         verbose_name='Имя',
         help_text='Ваше Имя',
         blank=True
     )
     last_name = models.CharField(
-        max_length=50,
+        max_length=150,
         verbose_name='Фамилия',
         help_text='Ваша Фамилия',
         blank=True
