@@ -66,6 +66,7 @@ class Reviews(models.Model):
     #  Жду модель юзера (она пока на pr)
     title = models.ForeignKey(
         Titles, on_delete=models.CASCADE, related_name='reviews')
+    text = models.TextField()
     score = models.IntegerField() # Добавлю граничные условия "от и до"
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)

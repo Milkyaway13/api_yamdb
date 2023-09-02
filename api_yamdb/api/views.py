@@ -73,12 +73,13 @@ class TitlesViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentsViewSet(viewsets.ModelViewSet):
+    '''Вьюсет для комментариев'''
     serializer_class = CommentsSerializer
 
     def get_queryset(self):
         title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
-        return title.comments.select_related('author')
+        return title.comments.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
@@ -86,11 +87,12 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
+    '''Вьюсет для отзывов'''
     serializer_class = ReviewsSerializer
 
     def get_queryset(self):
         title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
-        return title.reviews.select_related('author')
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
