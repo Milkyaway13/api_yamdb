@@ -2,7 +2,8 @@ import datetime as dt
 
 from rest_framework import serializers
 
-from titles.models import Categories, Genres, Titles, TitlesGenre
+from titles.models import Categories, Genres, Titles
+from users.models import User
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -69,5 +70,63 @@ class TitlesSerializer(serializers.ModelSerializer):
         if value > year:
             raise serializers.ValidationError(
                 'Год фильма не может быть больше текущего!'
+            )
+        return value
+
+
+class UserSerializer(serializers.ModelSerializer):
+    '''Сериализатор для информации о пользователях.'''
+
+    class Meta:
+        class Meta:
+            model = User
+            fields = (
+                'username',
+                'email',
+                'first_name',
+                'last_name',
+                'bio',
+                'role',
+            )
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    '''Сериализатор для токенов.'''
+
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    '''Сериализатор для создания пользователя.'''
+
+    username = serializers.RegexField(
+        regex=r'^[\w.@+-]+$',
+        max_length=150,
+        required=True
+    )
+
+    email = serializers.EmailField(
+        max_length=254,
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'bio',
+                  'role')
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя "me" запрещено.'
             )
         return value
