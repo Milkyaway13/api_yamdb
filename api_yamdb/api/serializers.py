@@ -2,8 +2,16 @@ import datetime as dt
 
 from rest_framework import serializers
 
-from titles.models import Categories, Genres, Titles
+
 from users.models import User
+from titles.models import (
+    Categories,
+    Comments,
+    Genres,
+    Reviews,
+    Titles,
+    TitlesGenre
+)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -130,3 +138,28 @@ class UserCreateSerializer(serializers.ModelSerializer):
                 'Имя пользователя "me" запрещено.'
             )
         return value
+
+class CommentsSerializer(serializers.ModelSerializer):
+    '''Сериализатор для комментариев'''
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'pub_date')
+        model = Comments
+
+
+class ReviewsSerializer(serializers.ModelSerializer):
+    '''Сериализатор для отзывов'''
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        fields = ('text', 'score')
+        model = Reviews
