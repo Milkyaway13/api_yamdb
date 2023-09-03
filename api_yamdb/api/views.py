@@ -1,5 +1,11 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, mixins, filters
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.response import Response
+
+from api.permissions import (
+    IsAdminUserOrReadOnly,
+    IsAuthorAdminSuperuserOrReadOnlyPermission,
+)
 from api.serializers import (
     CategoriesSerializer,
     CommentsSerializer,
@@ -7,9 +13,7 @@ from api.serializers import (
     ReviewsSerializer,
     TitlesSerializer,
 )
-from rest_framework import status
 from titles.models import Categories, Genres, Titles
-from rest_framework.response import Response
 
 
 class CategoriesViewSet(
@@ -18,11 +22,14 @@ class CategoriesViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
 ):
+    '''Вьюсет для категорий'''
+
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=name']
+    permission_classes = IsAdminUserOrReadOnly
 
 
 class GenresViewSet(
@@ -31,46 +38,38 @@ class GenresViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
 ):
+    '''Вьюсет для жанров'''
+
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=name']
+    permission_classes = IsAdminUserOrReadOnly
 
 
-class TitlesViewSet(viewsets.ViewSet):
+class TitlesViewSet(viewsets.ModelViewSet):
+    '''Вьюсет для тайтлов'''
+
     queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer
+    permission_classes = IsAuthorAdminSuperuserOrReadOnlyPermission
 
-    def get_title(self, queryset, slug):
-        return get_object_or_404(queryset, slug)
+    def update(self, request, *args, **kwargs):
+        return Response(
+            'Метод PUT запрещен!', status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
-    def list(self, request):
-        serializer = TitlesSerializer(self.queryset, many=True)
-        return Response(serializer.data)
-
-    def create(self, request):
-        serializer = TitlesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
-
-    def retrieve(self, request, slug=None):
-        serializer = TitlesSerializer(data=self.get_title(self.queryset, slug))
-        return Response(serializer.data)
-
-    def partial_update(self, request, slug=None):
+    def partial_update(self, request, *args, **kwargs):
         serializer = TitlesSerializer(
-            Titles, data=self.get_title(self.queryset, slug), partial=True
+            get_object_or_404(self.queryset, id=self.kwargs.get('pk')),
+            data=request.data,
+            partial=True,
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors)
-
-    def destroy(self, request, slug=None):
-        self.get_title(self.queryset, slug).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
