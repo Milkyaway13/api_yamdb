@@ -57,11 +57,13 @@ class Comments(models.Model):
     # )
     #  Жду модель юзера (она пока на pr)
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='comments')
+        Titles, on_delete=models.CASCADE, related_name='comments'
+    )
     text = models.TextField()
     created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
-    
+        'Дата добавления', auto_now_add=True, db_index=True
+    )
+
 
 class Reviews(models.Model):
     # author = models.ForeignKey(
@@ -71,8 +73,10 @@ class Reviews(models.Model):
     # )
     #  Жду модель юзера (она пока на pr)
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='reviews')
+        Titles, on_delete=models.CASCADE, related_name='reviews'
+    )
     text = models.TextField()
-    score = models.IntegerField() # Добавлю граничные условия "от и до"
+    score = models.IntegerField()  # Добавлю граничные условия "от и до"
     created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Дата добавления', auto_now_add=True, db_index=True
+    )

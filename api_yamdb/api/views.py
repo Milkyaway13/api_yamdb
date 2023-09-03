@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, status, viewsets
-from rest_framework.response import Response
+from rest_framework import filters, mixins, viewsets
 
 from api.permissions import (
     IsAdminUserOrReadOnly,
@@ -16,12 +15,16 @@ from api.serializers import (
 from titles.models import Categories, Genres, Titles
 
 
-class CategoriesViewSet(
+class ListCreateDestroyMixins(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
 ):
+    pass
+
+
+class CategoriesViewSet(ListCreateDestroyMixins):
     '''Вьюсет для категорий'''
 
     queryset = Categories.objects.all()
@@ -29,14 +32,11 @@ class CategoriesViewSet(
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=name']
-    permission_classes = IsAdminUserOrReadOnly
+    permission_classes = (IsAdminUserOrReadOnly,)
 
 
 class GenresViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
+    ListCreateDestroyMixins,
 ):
     '''Вьюсет для жанров'''
 
@@ -45,7 +45,7 @@ class GenresViewSet(
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=name']
-    permission_classes = IsAdminUserOrReadOnly
+    permission_classes = (IsAdminUserOrReadOnly,)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
@@ -53,27 +53,18 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
-    permission_classes = IsAuthorAdminSuperuserOrReadOnlyPermission
-
-    def update(self, request, *args, **kwargs):
-        return Response(
-            'Метод PUT запрещен!', status=status.HTTP_405_METHOD_NOT_ALLOWED
-        )
-
-    def partial_update(self, request, *args, **kwargs):
-        serializer = TitlesSerializer(
-            get_object_or_404(self.queryset, id=self.kwargs.get('pk')),
-            data=request.data,
-            partial=True,
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
+    http_method_names = (
+        'get',
+        'post',
+        'patch',
+        'delete',
+    )
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
     '''Вьюсет для комментариев'''
+
     serializer_class = CommentsSerializer
 
     def get_queryset(self):
@@ -87,6 +78,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
 class ReviewsViewSet(viewsets.ModelViewSet):
     '''Вьюсет для отзывов'''
+
     serializer_class = ReviewsSerializer
 
     def get_queryset(self):

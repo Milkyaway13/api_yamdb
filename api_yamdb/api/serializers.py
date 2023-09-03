@@ -1,16 +1,14 @@
 import datetime as dt
 
 from rest_framework import serializers
-
-
 from users.models import User
+
 from titles.models import (
     Categories,
     Comments,
     Genres,
     Reviews,
     Titles,
-    TitlesGenre
 )
 
 
@@ -113,9 +111,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     '''Сериализатор для создания пользователя.'''
 
     username = serializers.RegexField(
-        regex=r'^[\w.@+-]+$',
-        max_length=150,
-        required=True
+        regex=r'^[\w.@+-]+$', max_length=150, required=True
     )
 
     email = serializers.EmailField(
@@ -125,12 +121,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username',
-                  'email',
-                  'first_name',
-                  'last_name',
-                  'bio',
-                  'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
+        )
 
     def validate_username(self, value):
         if value == 'me':
@@ -139,12 +137,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
             )
         return value
 
+
 class CommentsSerializer(serializers.ModelSerializer):
     '''Сериализатор для комментариев'''
+
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username',
-        default=serializers.CurrentUserDefault()
+        default=serializers.CurrentUserDefault(),
     )
 
     class Meta:
@@ -154,10 +154,11 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 class ReviewsSerializer(serializers.ModelSerializer):
     '''Сериализатор для отзывов'''
+
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username',
-        default=serializers.CurrentUserDefault()
+        default=serializers.CurrentUserDefault(),
     )
 
     class Meta:
