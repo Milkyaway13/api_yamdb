@@ -18,8 +18,7 @@ class Command(BaseCommand):
         data = [(i) for i in dr]
         for i in range(len(data)):
             models.append(model(**data[i]))
-        model.objects.bulk_create(models)
-        print(data)
+        print(model.objects.bulk_create(models))
 
     def handle(self, *args: Any, **options: Any) -> str | None:
         path = options.get('path')
@@ -29,7 +28,7 @@ class Command(BaseCommand):
                 dr = csv.DictReader(fl)
                 if os.path.basename(fl.name) == 'category.csv':
                     self.create_data(dr, Categories)
-                elif os.path.basename(fl.name) == 'genres.csv':
+                elif os.path.basename(fl.name) == 'genre.csv':
                     self.create_data(dr, Genres)
                 elif os.path.basename(fl.name) == 'titles.csv':
                     self.create_data(dr, Titles)
