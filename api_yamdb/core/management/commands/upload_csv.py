@@ -4,7 +4,7 @@ from typing import Any
 
 from django.core.management.base import BaseCommand, CommandParser
 
-from titles.models import Categories, Genres, Titles
+from titles.models import Categories, Genres, Titles, TitlesGenre
 
 
 class Command(BaseCommand):
@@ -32,6 +32,8 @@ class Command(BaseCommand):
                     self.create_data(dr, Genres)
                 elif os.path.basename(fl.name) == 'titles.csv':
                     self.create_data(dr, Titles)
+                elif os.path.basename(fl.name) == 'genre_title.csv':
+                    self.create_data(dr, TitlesGenre)
 
         except Exception as error:
             print(f'Проверьте правильность введенных данных: {error}')
