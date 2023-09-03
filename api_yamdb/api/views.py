@@ -8,7 +8,9 @@ from api.permissions import (
 )
 from api.serializers import (
     CategoriesSerializer,
+    CommentsSerializer,
     GenresSerializer,
+    ReviewsSerializer,
     TitlesSerializer,
 )
 from titles.models import Categories, Genres, Titles
@@ -68,3 +70,29 @@ class TitlesViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+    '''Вьюсет для комментариев'''
+    serializer_class = CommentsSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        return title.comments.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
+
+
+class ReviewsViewSet(viewsets.ModelViewSet):
+    '''Вьюсет для отзывов'''
+    serializer_class = ReviewsSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
