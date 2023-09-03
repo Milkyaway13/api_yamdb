@@ -14,9 +14,11 @@ class Command(BaseCommand):
         parser.add_argument('path', type=str, help=u'полный путь к csv файлу')
 
     def create_data(self, dr, model):
+        models = []
         data = [(i) for i in dr]
         for i in range(len(data)):
-            model.objects.create(**data[i])
+            models.append(model(**data[i]))
+        model.objects.bulk_create(models)
         print(data)
 
     def handle(self, *args: Any, **options: Any) -> str | None:
