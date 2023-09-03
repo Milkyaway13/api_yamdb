@@ -1,6 +1,9 @@
+import csv
+import os
 from typing import Any
+
 from django.core.management.base import BaseCommand, CommandParser
-import csv, sqlite3, os
+
 from titles.models import Categories, Genres, Titles
 
 
