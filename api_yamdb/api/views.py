@@ -80,6 +80,13 @@ class CommentsViewSet(viewsets.ModelViewSet):
     '''Вьюсет для комментариев'''
 
     serializer_class = CommentsSerializer
+    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission, )
+    http_method_names = (
+        'get',
+        'post',
+        'patch',
+        'delete',
+    )
 
     def get_queryset(self):
         title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
@@ -94,6 +101,13 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     '''Вьюсет для отзывов'''
 
     serializer_class = ReviewsSerializer
+    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission, )
+    http_method_names = (
+        'get',
+        'post',
+        'patch',
+        'delete',
+    )
 
     def get_queryset(self):
         title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))

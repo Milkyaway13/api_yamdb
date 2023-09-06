@@ -1,5 +1,9 @@
 from django.db import models
 
+from django.core.validators import MaxValueValidator, MinValueValidator
+
+from users.models import User
+
 
 class Genres(models.Model):
     '''Модель жанров'''
@@ -36,6 +40,7 @@ class Titles(models.Model):
         verbose_name='Категория',
         related_name='titles',
     )
+    rating = models.IntegerField('Рейтинг')
 
     def __str__(self) -> str:
         return self.name
@@ -50,33 +55,36 @@ class TitlesGenre(models.Model):
 
 
 class Comments(models.Model):
-    # author = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name='comments'
-    # )
-    #  Жду модель юзера (она пока на pr)
-    title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='comments'
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments'
     )
-    text = models.TextField()
+    title = models.ForeignKey(
+        Titles, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField(blank=False)
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
 
 
 class Reviews(models.Model):
-    # author = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name='reviews'
-    # )
-    #  Жду модель юзера (она пока на pr)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
     title = models.ForeignKey(
         Titles, on_delete=models.CASCADE, related_name='reviews'
     )
     text = models.TextField()
-    score = models.IntegerField()  # Добавлю граничные условия "от и до"
+    score = models.IntegerField(
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1)
+        ],
+        blank=False
+    )
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )

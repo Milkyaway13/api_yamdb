@@ -68,6 +68,7 @@ class TitlesSerializer(serializers.ModelSerializer):
             'description',
             'genre',
             'category',
+            'rating',
         )
         model = Titles
 
@@ -164,3 +165,4 @@ class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('text', 'score')
         model = Reviews
+
