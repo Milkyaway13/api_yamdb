@@ -64,8 +64,9 @@ class Comments(models.Model):
         Titles, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField(blank=False)
     created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
-    
+        'Дата добавления', auto_now_add=True, db_index=True
+    )
+
 
 class Reviews(models.Model):
     author = models.ForeignKey(
@@ -74,7 +75,8 @@ class Reviews(models.Model):
         related_name='reviews'
     )
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='reviews')
+        Titles, on_delete=models.CASCADE, related_name='reviews'
+    )
     text = models.TextField()
     score = models.IntegerField(
         validators=[
@@ -84,4 +86,5 @@ class Reviews(models.Model):
         blank=False
     )
     created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Дата добавления', auto_now_add=True, db_index=True
+    )
