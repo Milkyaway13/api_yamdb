@@ -28,7 +28,7 @@ class Categories(models.Model):
 class Titles(models.Model):
     '''Модель тайтлов'''
 
-    name = models.CharField('Название произведения', max_length=500)
+    name = models.CharField('Название произведения', max_length=256)
     year = models.IntegerField('Год выпуска')
     description = models.TextField('Описание', blank=True, null=True)
     genre = models.ManyToManyField(
@@ -40,15 +40,19 @@ class Titles(models.Model):
         verbose_name='Категория',
         related_name='titles',
     )
-    rating = models.IntegerField('Рейтинг')
+    rating = models.IntegerField('Рейтинг', null=True)
 
     def __str__(self) -> str:
         return self.name
 
 
 class TitlesGenre(models.Model):
-    genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    genre = models.ForeignKey(
+        Genres, on_delete=models.CASCADE, related_name='genres'
+    )
+    title = models.ForeignKey(
+        Titles, on_delete=models.CASCADE, related_name='titles'
+    )
 
     def __str__(self):
         return f'{self.genre} {self.title}'
@@ -56,35 +60,28 @@ class TitlesGenre(models.Model):
 
 class Comments(models.Model):
     author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='comments'
+        User, on_delete=models.CASCADE, related_name='comments'
     )
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='comments')
+        Titles, on_delete=models.CASCADE, related_name='comments'
+    )
     text = models.TextField(blank=False)
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
 
 
 class Reviews(models.Model):
     author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='reviews'
+        User, on_delete=models.CASCADE, related_name='reviews'
     )
     title = models.ForeignKey(
         Titles, on_delete=models.CASCADE, related_name='reviews'
     )
     text = models.TextField()
     score = models.IntegerField(
-        validators=[
-            MaxValueValidator(10),
-            MinValueValidator(1)
-        ],
-        blank=False
+        validators=[MaxValueValidator(10), MinValueValidator(1)], blank=False
     )
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )

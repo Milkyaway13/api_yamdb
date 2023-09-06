@@ -59,6 +59,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     category = CategoryField(
         slug_field='slug', queryset=Categories.objects.all()
     )
+    rating = serializers.HiddenField(default=0)
 
     class Meta:
         fields = (
@@ -94,7 +95,7 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'role',
         )
-            
+
 
 class TokenSerializer(serializers.ModelSerializer):
     '''Сериализатор для токенов.'''
@@ -162,6 +163,11 @@ class ReviewsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('text', 'score')
+        fields = (
+            'id',
+            'author',
+            'text',
+            'score',
+            'pub_date',
+        )
         model = Reviews
-

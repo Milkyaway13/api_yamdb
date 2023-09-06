@@ -7,6 +7,8 @@ from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -68,6 +70,12 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = (
+        'name',
+        'year',
+        'category',
+    )
     http_method_names = (
         'get',
         'post',
@@ -80,7 +88,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     '''Вьюсет для комментариев'''
 
     serializer_class = CommentsSerializer
-    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission, )
+    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
     http_method_names = (
         'get',
         'post',
@@ -101,7 +109,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     '''Вьюсет для отзывов'''
 
     serializer_class = ReviewsSerializer
-    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission, )
+    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
     http_method_names = (
         'get',
         'post',
@@ -120,6 +128,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 class SignUpView(APIView):
     '''Вьюшка для авторизации'''
+
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCreateSerializer
     queryset = User.objects.all()
@@ -129,12 +138,11 @@ class SignUpView(APIView):
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            user, _ = User.objects.get_or_create(
-                **serializer.validated_data)
+            user, _ = User.objects.get_or_create(**serializer.validated_data)
         except IntegrityError:
             return Response(
                 'Такой логин или email уже существуют',
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
         confirmation_code = default_token_generator.make_token(user)
         user.confirmation_code = confirmation_code
@@ -148,12 +156,13 @@ class SignUpView(APIView):
             fail_silently=False,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 
 class GetTokenView(APIView):
     """Вьюшка для получения JWT-токена."""
+
     permission_classes = (permissions.AllowAny,)
-    
+
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -166,7 +175,6 @@ class GetTokenView(APIView):
         return Response({'token': str(token)}, status=status.HTTP_200_OK)
 
 
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -176,13 +184,17 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
-    @action(detail=False, methods=['get', 'patch'], url_path='me',
-            url_name='me', permission_classes=(permissions.IsAuthenticated,))
+    @action(
+        detail=False,
+        methods=['get', 'patch'],
+        url_path='me',
+        url_name='me',
+        permission_classes=(permissions.IsAuthenticated,),
+    )
     def about_me(self, request):
         if request.method == 'PATCH':
             serializer = UserCreateSerializer(
-                request.user, data=request.data,
-                partial=True
+                request.user, data=request.data, partial=True
             )
             serializer.is_valid(raise_exception=True)
             serializer.save(role=request.user.role)
