@@ -118,21 +118,6 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=title)
 
 
-class GetTokenView(APIView):
-    """Вьюшка для получения JWT-токена."""
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request):
-        serializer = TokenSerializer(data=request.data)
-        username = serializer.data['username']
-        user = get_object_or_404(User, username=username)
-        confirmation_code = serializer.data['confirmation_code']
-        if not default_token_generator.check_token(user, confirmation_code):
-            raise ValidationError('Неверный код')
-        token = AccessToken.for_user(user)
-        return Response({'token': str(token)}, status=status.HTTP_200_OK)
-
-
 class SignUpView(APIView):
     '''Вьюшка для авторизации'''
     permission_classes = (permissions.AllowAny,)
@@ -163,6 +148,23 @@ class SignUpView(APIView):
             fail_silently=False,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class GetTokenView(APIView):
+    """Вьюшка для получения JWT-токена."""
+    permission_classes = (permissions.AllowAny,)
+    
+    def post(self, request):
+        serializer = TokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.data['username']
+        user = get_object_or_404(User, username=username)
+        confirmation_code = serializer.data['confirmation_code']
+        if not default_token_generator.check_token(user, confirmation_code):
+            raise ValidationError('Неверный код')
+        token = AccessToken.for_user(user)
+        return Response({'token': str(token)}, status=status.HTTP_200_OK)
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
