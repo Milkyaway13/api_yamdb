@@ -7,6 +7,9 @@ from api.views import (
     GenresViewSet,
     ReviewsViewSet,
     TitlesViewSet,
+    UserViewSet,
+    SignUpView,
+    GetTokenView,
 )
 
 router = DefaultRouter()
@@ -22,7 +25,12 @@ router.register(
     CommentsViewSet,
     basename='comment',
 )
+router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
+    path('v1/auth/', include([
+        path('signup/', SignUpView.as_view()),
+        path('token/', GetTokenView.as_view())
+    ])),
 ]
