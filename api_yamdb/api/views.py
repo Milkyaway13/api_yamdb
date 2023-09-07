@@ -7,8 +7,7 @@ from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
+from django_filters import rest_framework
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -64,18 +63,28 @@ class GenresViewSet(
     permission_classes = (IsAdminUserOrReadOnly,)
 
 
+class TitleFilter(rest_framework.FilterSet):
+    genre = rest_framework.CharFilter(field_name='genre', lookup_expr='slug')
+    category = rest_framework.CharFilter(
+        field_name='category', lookup_expr='slug'
+    )
+
+    class Meta:
+        model = Titles
+        fields = (
+            'name',
+            'year',
+        )
+
+
 class TitlesViewSet(viewsets.ModelViewSet):
     '''Вьюсет для тайтлов'''
 
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = (
-        'name',
-        'year',
-        'category',
-    )
+    filter_backends = (rest_framework.DjangoFilterBackend,)
+    filterset_class = TitleFilter
     http_method_names = (
         'get',
         'post',
