@@ -1,3 +1,4 @@
+from django.core import validators
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -24,6 +25,12 @@ class User(AbstractUser):
     )
 
     username = models.CharField(
+        validators=[
+            validators.RegexValidator(
+                regex='^[\w.@+-]+\Z',
+                message='Username doesnt comply',
+            ),
+        ],
         max_length=150,
         verbose_name='Логин',
         help_text='Укажите логин',
@@ -36,7 +43,7 @@ class User(AbstractUser):
         unique=True,
     )
     confirmation_code = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name='Проверочный код'
+        max_length=150, blank=True, null=True, verbose_name='Проверочный код'
     )
     first_name = models.CharField(
         max_length=150, verbose_name='Имя', help_text='Ваше Имя', blank=True

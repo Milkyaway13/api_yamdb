@@ -43,7 +43,7 @@ class IsAuthorAdminSuperuserOrReadOnlyPermission(permissions.BasePermission):
 
 
 class IsAdminPermission(BasePermission):
-    """ "Проверка прав админа."""
+    """Проверка прав админа."""
 
     message = ("У вас нет прав администратора")
 
