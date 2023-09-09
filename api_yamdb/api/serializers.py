@@ -59,6 +59,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     category = CategoryField(
         slug_field='slug', queryset=Category.objects.all()
     )
+    rating = serializers.FloatField(read_only=True)
 
     class Meta:
         fields = (

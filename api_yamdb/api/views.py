@@ -16,6 +16,7 @@ from api.permissions import (
     IsAdminUserOrReadOnly,
     IsAuthorAdminSuperuserOrReadOnlyPermission,
     IsAdminPermission,
+    IsAdminOrReadOnlyPermisson,
 )
 from api.serializers import (
     CategoriesSerializer,
@@ -81,9 +82,9 @@ class TitleFilter(rest_framework.FilterSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     '''Вьюсет для тайтлов'''
 
-    queryset = Title.objects.all().annotate(Avg('reviews__score'))
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
-    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
+    permission_classes = (IsAdminOrReadOnlyPermisson,)
     filter_backends = (rest_framework.DjangoFilterBackend,)
     filterset_class = TitleFilter
     http_method_names = (
@@ -107,9 +108,9 @@ class CommentsViewSet(viewsets.ModelViewSet):
     )
 
     def get_obj(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         return get_object_or_404(
-            Review, pk=self.kwargs.get('reviews_id'), title=title
+            Review, pk=self.kwargs.get('reviews_id'),
+            title=get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         )
 
     def get_queryset(self):
@@ -138,8 +139,10 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         return self.get_obj(Title).reviews.all()
 
     def perform_create(self, serializer):
-        title = self.get_obj(Title)
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(
+            author=self.request.user,
+            title=self.get_obj(Title))
+    
 
     def create(self, request, *args, **kwargs):
         if len(self.get_obj(Title).reviews.filter(author=self.request.user)):

@@ -30,7 +30,7 @@ class Command(BaseCommand):
             models.append(model(**data[i]))
         print(model.objects.bulk_create(models))
 
-    def handle(self, *args: Any, **options: Any) -> str | None:
+    def handle(self, *args: Any, **options: Any):
         try:
             dir = options.get('dir')
 

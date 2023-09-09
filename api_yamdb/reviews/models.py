@@ -40,7 +40,6 @@ class Title(models.Model):
         verbose_name='Категория',
         related_name='titles',
     )
-    rating = models.IntegerField(null=True)
 
     def __str__(self) -> str:
         return self.name

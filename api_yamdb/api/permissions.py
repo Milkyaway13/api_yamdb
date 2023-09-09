@@ -49,3 +49,27 @@ class IsAdminPermission(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_admin
+
+
+class IsAdminOrReadOnlyPermisson(BasePermission):
+    """
+    Проверка, является ли пользователь админом,
+    модером или суперюзером.
+    """
+
+    message = (
+        "Доступ разрешен только для администраторов,"
+        "модераторов и суперюзеров"
+    )
+
+    def has_permission(self, request, view):
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated and request.user.is_admin
+        )
+
+    def has_object_permission(self, request, view, obj):
+        return request.method in permissions.SAFE_METHODS or (
+            request.user.is_admin
+            or request.user.is_moderator
+        )
