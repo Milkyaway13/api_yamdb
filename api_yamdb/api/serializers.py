@@ -3,12 +3,12 @@ import datetime as dt
 from rest_framework import serializers
 from users.models import User
 
-from titles.models import (
-    Categories,
-    Comments,
-    Genres,
-    Reviews,
-    Titles,
+from reviews.models import (
+    Category,
+    Comment,
+    Genre,
+    Review,
+    Title,
 )
 
 
@@ -20,7 +20,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
             'name',
             'slug',
         )
-        model = Categories
+        model = Category
 
 
 class GenresSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class GenresSerializer(serializers.ModelSerializer):
             'name',
             'slug',
         )
-        model = Genres
+        model = Genre
 
 
 class CategoryField(serializers.SlugRelatedField):
@@ -54,12 +54,11 @@ class TitlesSerializer(serializers.ModelSerializer):
     '''Сериализатор для тайтлов'''
 
     genre = GenreField(
-        slug_field='slug', queryset=Genres.objects.all(), many=True
+        slug_field='slug', queryset=Genre.objects.all(), many=True
     )
     category = CategoryField(
-        slug_field='slug', queryset=Categories.objects.all()
+        slug_field='slug', queryset=Category.objects.all()
     )
-    rating = serializers.HiddenField(default=0)
 
     class Meta:
         fields = (
@@ -71,7 +70,8 @@ class TitlesSerializer(serializers.ModelSerializer):
             'category',
             'rating',
         )
-        model = Titles
+        model = Title
+        read_only_fields = ('rating',)
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -150,7 +150,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
-        model = Comments
+        model = Comment
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
@@ -170,4 +170,4 @@ class ReviewsSerializer(serializers.ModelSerializer):
             'score',
             'pub_date',
         )
-        model = Reviews
+        model = Review

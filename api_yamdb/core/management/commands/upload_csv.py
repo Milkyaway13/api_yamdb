@@ -5,12 +5,12 @@ from typing import Any
 from django.core.management.base import BaseCommand, CommandParser
 from users.models import User
 
-from titles.models import (
-    Categories,
-    Comments,
-    Genres,
-    Reviews,
-    Titles,
+from reviews.models import (
+    Category,
+    Comment,
+    Genre,
+    Review,
+    Title,
     TitlesGenre,
 )
 
@@ -41,19 +41,19 @@ class Command(BaseCommand):
                     encoding='UTF-8',
                 ) as fl:
                     dr = csv.DictReader(fl)
-                    if filename == 'category.csv':
-                        self.create_data(dr, Categories)
-                    elif filename == 'genre.csv':
-                        self.create_data(dr, Genres)
-                    elif filename == 'titles.csv':
-                        self.create_data(dr, Titles)
-                    elif filename == 'genre_title.csv':
+                    if filename == '2. category.csv':
+                        self.create_data(dr, Category)
+                    elif filename == '3. genre.csv':
+                        self.create_data(dr, Genre)
+                    elif filename == '4. titles.csv':
+                        self.create_data(dr, Title)
+                    elif filename == '5. genre_title.csv':
                         self.create_data(dr, TitlesGenre)
-                    elif filename == 'comments.csv':
-                        self.create_data(dr, Comments)
-                    elif filename == 'review.csv':
-                        self.create_data(dr, Reviews)
-                    elif filename == 'users.csv':
+                    elif filename == '7. comments.csv':
+                        self.create_data(dr, Comment)
+                    elif filename == '6. review.csv':
+                        self.create_data(dr, Review)
+                    elif filename == '1. users.csv':
                         self.create_data(dr, User)
 
         except Exception as error:

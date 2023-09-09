@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -26,7 +27,7 @@ from api.serializers import (
     UserCreateSerializer,
     TokenSerializer,
 )
-from titles.models import Categories, Genres, Titles
+from reviews.models import Category, Genre, Title, Review
 from users.models import User
 
 
@@ -42,7 +43,7 @@ class ListCreateDestroyMixins(
 class CategoriesViewSet(ListCreateDestroyMixins):
     '''Вьюсет для категорий'''
 
-    queryset = Categories.objects.all()
+    queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
@@ -55,7 +56,7 @@ class GenresViewSet(
 ):
     '''Вьюсет для жанров'''
 
-    queryset = Genres.objects.all()
+    queryset = Genre.objects.all()
     serializer_class = GenresSerializer
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
@@ -70,7 +71,7 @@ class TitleFilter(rest_framework.FilterSet):
     )
 
     class Meta:
-        model = Titles
+        model = Title
         fields = (
             'name',
             'year',
@@ -80,7 +81,7 @@ class TitleFilter(rest_framework.FilterSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     '''Вьюсет для тайтлов'''
 
-    queryset = Titles.objects.all()
+    queryset = Title.objects.all().annotate(Avg('reviews__score'))
     serializer_class = TitlesSerializer
     permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
     filter_backends = (rest_framework.DjangoFilterBackend,)
@@ -105,13 +106,17 @@ class CommentsViewSet(viewsets.ModelViewSet):
         'delete',
     )
 
+    def get_obj(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return get_object_or_404(
+            Review, pk=self.kwargs.get('reviews_id'), title=title
+        )
+
     def get_queryset(self):
-        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
-        return title.comments.all()
+        return self.get_obj().comments.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, review=self.get_obj())
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
@@ -126,13 +131,24 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         'delete',
     )
 
+    def get_obj(self, model):
+        return get_object_or_404(model, pk=self.kwargs.get('title_id'))
+
     def get_queryset(self):
-        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
-        return title.reviews.all()
+        return self.get_obj(Title).reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Titles, pk=self.kwargs.get('title_id'))
+        title = self.get_obj(Title)
         serializer.save(author=self.request.user, title=title)
+
+    def create(self, request, *args, **kwargs):
+        if len(self.get_obj(Title).reviews.filter(author=self.request.user)):
+            return Response(
+                'Нельзя оценить одно произведение дважды!',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return super().create(request, *args, **kwargs)
 
 
 class SignUpView(APIView):
