@@ -5,11 +5,11 @@ from api.views import (
     CategoriesViewSet,
     CommentsViewSet,
     GenresViewSet,
+    GetTokenView,
     ReviewsViewSet,
+    SignUpView,
     TitlesViewSet,
     UserViewSet,
-    SignUpView,
-    GetTokenView,
 )
 
 router = DefaultRouter()
@@ -29,8 +29,13 @@ router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path('v1/auth/', include([
-        path('signup/', SignUpView.as_view()),
-        path('token/', GetTokenView.as_view())
-    ])),
+    path(
+        'v1/auth/',
+        include(
+            [
+                path('signup/', SignUpView.as_view()),
+                path('token/', GetTokenView.as_view()),
+            ]
+        ),
+    ),
 ]

@@ -3,16 +3,8 @@ import os
 from typing import Any
 
 from django.core.management.base import BaseCommand, CommandParser
+from reviews.models import Category, Comment, Genre, Review, Title, TitlesGenre
 from users.models import User
-
-from reviews.models import (
-    Category,
-    Comment,
-    Genre,
-    Review,
-    Title,
-    TitlesGenre,
-)
 
 
 class Command(BaseCommand):

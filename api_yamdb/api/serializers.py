@@ -1,19 +1,12 @@
 import datetime as dt
 
 from rest_framework import serializers
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
-
-from reviews.models import (
-    Category,
-    Comment,
-    Genre,
-    Review,
-    Title,
-)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    '''Сериализатор для категорий'''
+    '''Сериализатор для категорий.'''
 
     class Meta:
         fields = (
@@ -24,7 +17,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    '''Сериализатор для жанров'''
+    '''Сериализатор для жанров.'''
 
     class Meta:
         fields = (
@@ -35,7 +28,7 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class CategoryField(serializers.SlugRelatedField):
-    '''Кастомное слаг поле категории'''
+    '''Кастомное слаг поле категории.'''
 
     def to_representation(self, value):
         serializer = CategoriesSerializer(value)
@@ -43,7 +36,7 @@ class CategoryField(serializers.SlugRelatedField):
 
 
 class GenreField(serializers.SlugRelatedField):
-    '''Кастомное слаг поле жанра'''
+    '''Кастомное слаг поле жанра.'''
 
     def to_representation(self, value):
         serializer = GenresSerializer(value)
@@ -51,7 +44,7 @@ class GenreField(serializers.SlugRelatedField):
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    '''Сериализатор для тайтлов'''
+    '''Сериализатор для тайтлов.'''
 
     genre = GenreField(
         slug_field='slug', queryset=Genre.objects.all(), many=True

@@ -3,11 +3,9 @@ from rest_framework.permissions import BasePermission
 
 
 class IsAdminUserOrReadOnly(BasePermission):
-    """Проверка на залогиненного пользователя"""
+    """Проверка на залогиненного пользователя."""
 
-    message = (
-        "Доступ разрешен только для авторизованных пользователей."
-    )
+    message = "Доступ разрешен только для авторизованных пользователей."
 
     def has_permission(self, request, view):
         return (
@@ -45,7 +43,7 @@ class IsAuthorAdminSuperuserOrReadOnlyPermission(permissions.BasePermission):
 class IsAdminPermission(BasePermission):
     """Проверка прав админа."""
 
-    message = ("У вас нет прав администратора")
+    message = "У вас нет прав администратора"
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_admin
@@ -65,11 +63,11 @@ class IsAdminOrReadOnlyPermisson(BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated and request.user.is_admin
+            or request.user.is_authenticated
+            and request.user.is_admin
         )
 
     def has_object_permission(self, request, view, obj):
         return request.method in permissions.SAFE_METHODS or (
-            request.user.is_admin
-            or request.user.is_moderator
+            request.user.is_admin or request.user.is_moderator
         )
