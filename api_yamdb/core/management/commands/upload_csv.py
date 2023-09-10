@@ -3,16 +3,8 @@ import os
 from typing import Any
 
 from django.core.management.base import BaseCommand, CommandParser
+from reviews.models import Category, Comment, Genre, Review, Title, TitlesGenre
 from users.models import User
-
-from reviews.models import (
-    Category,
-    Comment,
-    Genre,
-    Review,
-    Title,
-    TitlesGenre,
-)
 
 
 class Command(BaseCommand):
@@ -30,7 +22,7 @@ class Command(BaseCommand):
             models.append(model(**data[i]))
         print(model.objects.bulk_create(models))
 
-    def handle(self, *args: Any, **options: Any) -> str | None:
+    def handle(self, *args: Any, **options: Any):
         try:
             dir = options.get('dir')
 

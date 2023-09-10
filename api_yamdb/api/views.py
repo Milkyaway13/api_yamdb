@@ -4,18 +4,21 @@ from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters import rest_framework
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from django_filters import rest_framework
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
 
 from api.permissions import (
+    IsAdminOrReadOnlyPermisson,
+    IsAdminPermission,
     IsAdminUserOrReadOnly,
     IsAuthorAdminSuperuserOrReadOnlyPermission,
-    IsAdminPermission,
 )
 from api.serializers import (
     CategoriesSerializer,
@@ -23,12 +26,10 @@ from api.serializers import (
     GenresSerializer,
     ReviewsSerializer,
     TitlesSerializer,
-    UserSerializer,
-    UserCreateSerializer,
     TokenSerializer,
+    UserCreateSerializer,
+    UserSerializer,
 )
-from reviews.models import Category, Genre, Title, Review
-from users.models import User
 
 
 class ListCreateDestroyMixins(
@@ -81,9 +82,9 @@ class TitleFilter(rest_framework.FilterSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     '''Вьюсет для тайтлов'''
 
-    queryset = Title.objects.all().annotate(Avg('reviews__score'))
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
-    permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
+    permission_classes = (IsAdminOrReadOnlyPermisson,)
     filter_backends = (rest_framework.DjangoFilterBackend,)
     filterset_class = TitleFilter
     http_method_names = (
@@ -107,9 +108,10 @@ class CommentsViewSet(viewsets.ModelViewSet):
     )
 
     def get_obj(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         return get_object_or_404(
-            Review, pk=self.kwargs.get('reviews_id'), title=title
+            Review,
+            pk=self.kwargs.get('reviews_id'),
+            title=get_object_or_404(Title, pk=self.kwargs.get('title_id')),
         )
 
     def get_queryset(self):
@@ -120,7 +122,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
-    '''Вьюсет для отзывов'''
+    '''Вьюсет для отзывов.'''
 
     serializer_class = ReviewsSerializer
     permission_classes = (IsAuthorAdminSuperuserOrReadOnlyPermission,)
@@ -138,8 +140,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         return self.get_obj(Title).reviews.all()
 
     def perform_create(self, serializer):
-        title = self.get_obj(Title)
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=self.get_obj(Title))
 
     def create(self, request, *args, **kwargs):
         if len(self.get_obj(Title).reviews.filter(author=self.request.user)):
@@ -152,7 +153,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 
 class SignUpView(APIView):
-    '''Вьюшка для авторизации'''
+    '''Вьюшка для авторизации.'''
 
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCreateSerializer
@@ -201,6 +202,8 @@ class GetTokenView(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Вьюсет для пользователей."""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminPermission,)

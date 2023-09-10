@@ -1,5 +1,5 @@
-from django.core import validators
 from django.contrib.auth.models import AbstractUser
+from django.core import validators
 from django.db import models
 
 ADMIN = 'admin'
@@ -14,6 +14,8 @@ CHOICES = (
 
 
 class User(AbstractUser):
+    """Кастомная модель юзера."""
+
     ADMIN = 'admin'
     MODERATOR = 'moderator'
     USER = 'user'
@@ -27,7 +29,7 @@ class User(AbstractUser):
     username = models.CharField(
         validators=[
             validators.RegexValidator(
-                regex='^[\w.@+-]+\Z',
+                regex=r'^[\w.@+-]+\Z',
                 message='Username doesnt comply',
             ),
         ],

@@ -1,12 +1,10 @@
-from django.db import models
-
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from django.db import models
 from users.models import User
 
 
 class Genre(models.Model):
-    '''Модель жанров'''
+    '''Модель жанров.'''
 
     name = models.CharField('Имя жанра', max_length=20)
     slug = models.SlugField('Ссылка на жанры', unique=True, max_length=20)
@@ -16,7 +14,7 @@ class Genre(models.Model):
 
 
 class Category(models.Model):
-    '''Модель категорий'''
+    '''Модель категорий.'''
 
     name = models.CharField('Имя категории', max_length=256)
     slug = models.SlugField('Ссылка на категорию', unique=True, max_length=50)
@@ -26,7 +24,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    '''Модель тайтлов'''
+    '''Модель тайтлов.'''
 
     name = models.CharField('Название произведения', max_length=256)
     year = models.IntegerField('Год выпуска')
@@ -40,13 +38,14 @@ class Title(models.Model):
         verbose_name='Категория',
         related_name='titles',
     )
-    rating = models.IntegerField(null=True)
 
     def __str__(self) -> str:
         return self.name
 
 
 class TitlesGenre(models.Model):
+    '''Модель жанров.'''
+
     genre = models.ForeignKey(
         Genre, on_delete=models.CASCADE, related_name='genres'
     )
@@ -59,6 +58,8 @@ class TitlesGenre(models.Model):
 
 
 class Review(models.Model):
+    '''Модель отзывов.'''
+
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews'
     )
@@ -83,6 +84,8 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
+    '''Модель комментов.'''
+
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments'
     )
