@@ -77,10 +77,13 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title'],
+                fields=('author', 'title'),
                 name='unique_author_title',
             )
         ]
+
+    def __str__(self) -> str:
+        return f'{self.text}'
 
 
 class Comment(models.Model):
@@ -96,3 +99,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
+
+    def __str__(self) -> str:
+        return f'{self.text}'
