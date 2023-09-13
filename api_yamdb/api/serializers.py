@@ -2,7 +2,9 @@ import datetime as dt
 
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
+
 from users.models import User
+from .utils import validate_username_field
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -102,28 +104,29 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.Serializer):
     '''Сериализатор для создания пользователя.'''
 
-    username = serializers.RegexField(
-        regex=r'^[\w.@+-]+\Z', max_length=150, required=True
+    username = serializers.RegexField( 
+        regex=r'^[\w.@+-]+\Z', max_length=150, required=True,
+        validators=(validate_username_field,)
     )
-
     email = serializers.EmailField(
         max_length=254,
         required=True,
     )
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+    bio = serializers.CharField(max_length=1000, required=False)
+    role = serializers.CharField(max_length=150, required=False)
 
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role',
-        )
+    def create(self, validated_data):
+        return User.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.__dict__.update(validated_data)
+        instance.save()
+        return instance
 
     def validate_username(self, value):
         if value == 'me':
