@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core import validators
 from django.db import models
 
+from api.utils import validate_username_field
+
 ADMIN = 'admin'
 MODERATOR = 'moderator'
 USER = 'user'
@@ -27,12 +29,13 @@ class User(AbstractUser):
     )
 
     username = models.CharField(
-        validators=[
+        validators=(
             validators.RegexValidator(
                 regex=r'^[\w.@+-]+\Z',
                 message='Username doesnt comply',
             ),
-        ],
+            validate_username_field,
+        ),
         max_length=150,
         verbose_name='Логин',
         help_text='Укажите логин',
@@ -76,7 +79,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == User.ADMIN
+        return self.role == User.ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):

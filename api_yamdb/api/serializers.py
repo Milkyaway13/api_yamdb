@@ -1,9 +1,9 @@
-import datetime as dt
-
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+
+from .utils import validate_username_field, validate_year_field
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -54,6 +54,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         slug_field='slug', queryset=Category.objects.all()
     )
     rating = serializers.FloatField(read_only=True)
+    year = serializers.IntegerField(validators=(validate_year_field,))
 
     class Meta:
         fields = (
@@ -67,14 +68,6 @@ class TitlesSerializer(serializers.ModelSerializer):
         )
         model = Title
         read_only_fields = ('rating',)
-
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError(
-                'Год фильма не может быть больше текущего!'
-            )
-        return value
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -103,35 +96,31 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.Serializer):
     '''Сериализатор для создания пользователя.'''
 
     username = serializers.RegexField(
-        regex=r'^[\w.@+-]+\Z', max_length=150, required=True
+        regex=r'^[\w.@+-]+\Z',
+        max_length=150,
+        required=True,
+        validators=(validate_username_field,),
     )
-
     email = serializers.EmailField(
         max_length=254,
         required=True,
     )
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+    bio = serializers.CharField(max_length=1000, required=False)
+    role = serializers.CharField(max_length=150, required=False)
 
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role',
-        )
+    def create(self, validated_data):
+        return User.objects.create(**validated_data)
 
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Имя пользователя "me" запрещено.'
-            )
-        return value
+    def update(self, instance, validated_data):
+        instance.__dict__.update(validated_data)
+        instance.save()
+        return instance
 
 
 class CommentsSerializer(serializers.ModelSerializer):
