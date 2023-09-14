@@ -83,7 +83,7 @@ class Review(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f'{self.author} {self.text}'
+        return f'Отзыв {self.author} на {self.title.name}'
 
 
 class Comment(models.Model):
@@ -101,4 +101,4 @@ class Comment(models.Model):
     )
 
     def __str__(self) -> str:
-        return f'{self.author} {self.text}'
+        return f'Комментарий {self.author} на {self.review}'
