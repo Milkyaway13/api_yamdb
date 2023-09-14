@@ -121,13 +121,6 @@ class UserCreateSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Имя пользователя "me" запрещено.'
-            )
-        return value
-
 
 class CommentsSerializer(serializers.ModelSerializer):
     '''Сериализатор для комментариев'''
