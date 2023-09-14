@@ -11,8 +11,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Review, Title
-from users.models import User
 
 from api.permissions import (
     IsAdminOrReadOnlyPermisson,
@@ -30,6 +28,8 @@ from api.serializers import (
     UserCreateSerializer,
     UserSerializer,
 )
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
 
 
 class ListCreateDestroyMixins(
@@ -47,8 +47,8 @@ class CategoriesViewSet(ListCreateDestroyMixins):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['=name']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
     permission_classes = (IsAdminUserOrReadOnly,)
 
 
@@ -60,8 +60,8 @@ class GenresViewSet(
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['=name']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
     permission_classes = (IsAdminUserOrReadOnly,)
 
 

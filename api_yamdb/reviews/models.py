@@ -75,12 +75,12 @@ class Review(models.Model):
     )
 
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
                 fields=('author', 'title'),
                 name='unique_author_title',
-            )
-        ]
+            ),
+        )
 
     def __str__(self) -> str:
         return f'Отзыв {self.author} на {self.title.name}'
