@@ -2,6 +2,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
 
+from api.utils import validate_year_field
+
 
 class Genre(models.Model):
     '''Модель жанров.'''
@@ -27,7 +29,9 @@ class Title(models.Model):
     '''Модель тайтлов.'''
 
     name = models.CharField('Название произведения', max_length=256)
-    year = models.IntegerField('Год выпуска')
+    year = models.IntegerField(
+        'Год выпуска', validators=(validate_year_field,)
+    )
     description = models.TextField('Описание', blank=True, null=True)
     genre = models.ManyToManyField(
         Genre, verbose_name='Жанры', through='TitlesGenre'

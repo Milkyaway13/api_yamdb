@@ -1,10 +1,8 @@
-import datetime as dt
-
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
-
 from users.models import User
-from .utils import validate_username_field
+
+from .utils import validate_username_field, validate_year_field
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -55,6 +53,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         slug_field='slug', queryset=Category.objects.all()
     )
     rating = serializers.FloatField(read_only=True)
+    year = serializers.IntegerField(validators=(validate_year_field,))
 
     class Meta:
         fields = (
@@ -68,14 +67,6 @@ class TitlesSerializer(serializers.ModelSerializer):
         )
         model = Title
         read_only_fields = ('rating',)
-
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError(
-                'Год фильма не может быть больше текущего!'
-            )
-        return value
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -107,9 +98,11 @@ class TokenSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.Serializer):
     '''Сериализатор для создания пользователя.'''
 
-    username = serializers.RegexField( 
-        regex=r'^[\w.@+-]+\Z', max_length=150, required=True,
-        validators=(validate_username_field,)
+    username = serializers.RegexField(
+        regex=r'^[\w.@+-]+\Z',
+        max_length=150,
+        required=True,
+        validators=(validate_username_field,),
     )
     email = serializers.EmailField(
         max_length=254,
