@@ -210,11 +210,11 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     lookup_field = 'username'
     search_fields = ('username',)
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete',)
 
     @action(
         detail=False,
-        methods=['get', 'patch'],
+        methods=('get', 'patch',),
         url_path='me',
         url_name='me',
         permission_classes=(permissions.IsAuthenticated,),
