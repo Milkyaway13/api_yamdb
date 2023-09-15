@@ -2,6 +2,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
 
+from api.utils import validate_year_field
+
 
 class Genre(models.Model):
     '''Модель жанров.'''
@@ -27,7 +29,9 @@ class Title(models.Model):
     '''Модель тайтлов.'''
 
     name = models.CharField('Название произведения', max_length=256)
-    year = models.IntegerField('Год выпуска')
+    year = models.IntegerField(
+        'Год выпуска', validators=(validate_year_field,)
+    )
     description = models.TextField('Описание', blank=True, null=True)
     genre = models.ManyToManyField(
         Genre, verbose_name='Жанры', through='TitlesGenre'
@@ -75,12 +79,15 @@ class Review(models.Model):
     )
 
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=['author', 'title'],
+                fields=('author', 'title'),
                 name='unique_author_title',
-            )
-        ]
+            ),
+        )
+
+    def __str__(self) -> str:
+        return f'Отзыв {self.author} на {self.title.name}'
 
 
 class Comment(models.Model):
@@ -96,3 +103,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
+
+    def __str__(self) -> str:
+        return f'Комментарий {self.author} на {self.review}'

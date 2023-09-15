@@ -5,4 +5,4 @@ skip-string-normalization = true
 [tool.isort]
 profile = "black"
 line_length = 79
-known_local_folder = ["api", "titles"]
+known_local_folder = ["api", "reviews", "core", "users"]
